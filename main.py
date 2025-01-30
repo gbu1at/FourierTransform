@@ -4,12 +4,30 @@ from matplotlib.animation import FuncAnimation
 from scipy.integrate import quad
 import matplotlib.gridspec as gridspec
 from matplotlib.widgets import Button
+import argparse
 
-sampling_rate = 1000
+
+def parse_args():
+    parser = argparse.ArgumentParser(description='Parse signal parameters.')
+    parser.add_argument('--sampling_rate', type=int, default=1000, help='Sampling rate of the signal (default: 1000)')
+    parser.add_argument('--frequencies', type=str, default="2, 5, 8", help='Comma-separated list of frequencies')
+    parser.add_argument('--shiftes', type=str, default="0, 0, 0", help='Comma-separated list of phase shifts in radians')
+    
+    args = parser.parse_args()
+    
+    if (args.frequencies is None) != (args.shiftes is None):
+        parser.error("Both --frequencies and --shiftes must be provided together.")
+    
+    frequencies = list(map(float, args.frequencies.split(','))) if args.frequencies else []
+    shiftes = list(map(lambda x: np.pi * float(x) / 180, args.shiftes.split(','))) if args.shiftes else []
+    
+    return args.sampling_rate, frequencies, shiftes
+
+
+sampling_rate, frequencies, shiftes = parse_args()
+
+
 time_points = np.linspace(0, 5, sampling_rate, endpoint=False)
-
-frequencies = [2, 5, 8]
-shiftes = [np.pi/2, 0, 0]
 
 signal_func = lambda t: np.sum([np.sin(2 * np.pi * f * t + s) for f, s in zip(frequencies, shiftes)], axis=0)
 
@@ -118,7 +136,6 @@ def restart(event):
     ani.event_source.stop()
 
     ani = FuncAnimation(fig, update, frames=np.linspace(0, 10, 200), init_func=init, blit=True, interval=50, repeat=False)
-
 
     plt.draw()
 
