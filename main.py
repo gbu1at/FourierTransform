@@ -96,8 +96,8 @@ def init():
     y_cm_values = []
     line.set_data([], [])
     text.set_text('')
-    for vline in vlines:
-        vline.set_xdata(0)
+    # for vline in vlines:
+    #     vline.set_xdata(0)
     cm_point.set_data(0, 0)
     line_x_cm.set_data([], [])
     line_y_cm.set_data([], [])
